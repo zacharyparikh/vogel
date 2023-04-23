@@ -38,6 +38,7 @@ const config = {
         unnamedComponents: 'arrow-function',
       },
     ],
+    'react/jsx-props-no-spreading': 'off',
     '@typescript-eslint/consistent-type-imports': [
       'warn',
       {

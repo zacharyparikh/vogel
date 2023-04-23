@@ -4,6 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { type NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
+import { LoadingSpinner } from '~/components/loading-spinner';
 import { api, type RouterOutputs } from '~/utils/api';
 
 dayjs.extend(relativeTime);
@@ -63,8 +64,12 @@ const PostView = ({
 };
 
 const Home: NextPage = () => {
-  const { data: posts } = api.posts.getAll.useQuery();
+  const { data: posts, isLoading } = api.posts.getAll.useQuery();
   const user = useUser();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
