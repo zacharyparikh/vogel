@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { type NextPage } from 'next';
 import Image from 'next/image';
+import { useState } from 'react';
 import { LoadingSpinner } from '~/components/loading-spinner';
 import { api, type RouterOutputs } from '~/utils/api';
 
@@ -10,6 +11,14 @@ dayjs.extend(relativeTime);
 
 const FeedHeader = () => {
   const { user } = useUser();
+  const [value, setValue] = useState('');
+  const ctx = api.useContext();
+  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+    onSuccess() {
+      setValue('');
+      ctx.posts.getAll.invalidate().catch(() => {});
+    },
+  });
 
   if (!user) {
     return null;
@@ -27,7 +36,13 @@ const FeedHeader = () => {
       <input
         placeholder="What's Happening? 🦃 🐓 🦆"
         className="grow bg-transparent outline-none"
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        disabled={isPosting}
       />
+      <button type="button" onClick={() => mutate({ content: value })}>
+        Post
+      </button>
     </div>
   );
 };
