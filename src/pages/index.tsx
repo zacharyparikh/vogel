@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { type NextPage } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { LoadingSpinner } from '~/components/loading-spinner';
@@ -14,10 +15,10 @@ const FeedHeader = () => {
   const { user } = useUser();
   const [value, setValue] = useState('');
   const ctx = api.useContext();
-  const { mutate, isLoading: isPosting } = api.posts.create.useMutation({
+  const { mutate, isLoading: isPosting } = api.post.create.useMutation({
     onSuccess() {
       setValue('');
-      ctx.posts.getAll.invalidate().catch(() => {});
+      ctx.post.getAll.invalidate().catch(() => {});
     },
 
     onError(error) {
@@ -77,7 +78,7 @@ const FeedHeader = () => {
   );
 };
 
-type PostWithUser = RouterOutputs['posts']['getAll'][number];
+type PostWithUser = RouterOutputs['post']['getAll'][number];
 type PostProps = { postWithUser: PostWithUser };
 const PostView = ({
   postWithUser: {
@@ -88,27 +89,33 @@ const PostView = ({
   const atUsername = `@${username}`;
   return (
     <div className="flex gap-3 border-b border-slate-400 p-4" key={id}>
-      <Image
-        src={profileImageUrl}
-        alt={`${atUsername}'s profile`}
-        height={60}
-        width={60}
-        className="rounded-full"
-      />
+      <Link href={`/${username}`}>
+        <Image
+          src={profileImageUrl}
+          alt={`${atUsername}'s profile`}
+          height={60}
+          width={60}
+          className="rounded-full"
+        />
+      </Link>
       <div className="flex flex-col">
-        <div className="flex gap-2 text-slate-300">
-          <span>{atUsername}</span>
-          <span>·</span>
-          <span className="font-thin">{dayjs(createdAt).fromNow()}</span>
+        <div className="flex gap-1 text-slate-300">
+          <Link href={`/${username}`}>{atUsername}</Link>
+          <Link href={`/post/${id}`}>
+            <span> · </span>
+            <span className="font-thin">{dayjs(createdAt).fromNow()}</span>
+          </Link>
         </div>
-        <span className="text-2xl">{content}</span>
+        <Link href={`/post/${id}`}>
+          <span className="text-2xl">{content}</span>
+        </Link>
       </div>
     </div>
   );
 };
 
 const Feed = () => {
-  const { data: posts, isLoading } = api.posts.getAll.useQuery();
+  const { data: posts, isLoading } = api.post.getAll.useQuery();
 
   if (isLoading) {
     return (
@@ -129,7 +136,7 @@ const Feed = () => {
 
 const Home: NextPage = () => {
   const { isLoaded, isSignedIn } = useUser();
-  api.posts.getAll.useQuery();
+  api.post.getAll.useQuery();
 
   if (!isLoaded) {
     return <div />;

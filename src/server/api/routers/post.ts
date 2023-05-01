@@ -22,7 +22,7 @@ const ratelimit = new Ratelimit({
   prefix: '@upstash/ratelimit',
 });
 
-export const postsRouter = createTRPCRouter({
+export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.prisma.post.findMany({
       take: 100,
