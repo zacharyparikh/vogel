@@ -63,7 +63,11 @@ export const postsRouter = createTRPCRouter({
   }),
 
   create: privateProcedure
-    .input(z.object({ content: z.string().emoji().min(1).max(280) }))
+    .input(
+      z.object({
+        content: z.string().emoji('Only emojis are allowed').min(1).max(280),
+      })
+    )
     .mutation(async ({ ctx: { userId, prisma }, input: { content } }) => {
       const { success } = await ratelimit.limit(userId);
 
